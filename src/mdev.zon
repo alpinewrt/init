@@ -1,0 +1,6 @@
+.{
+    .{ .basename = "null", .mode = 0o666 },
+    .{ .basename = "mem", .mode = 0o640 },
+    .{ .basename = "kmem", .mode = 0o640 },
+    .{ .basename = "urandom", .mode = 0o444 },
+}
