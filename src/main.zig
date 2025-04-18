@@ -73,7 +73,9 @@ fn panicFn(
         },
         else => {}, // Panicked while printing the recursive panic message.
     };
-    while (true) {}
+
+    sysShutdownOrReboot(.sys_reboot, "bootloader") catch {};
+    unreachable;
 }
 
 /// Must be called only after adding 1 to `panicking`. There are three callsites.
@@ -85,6 +87,19 @@ fn waitForOtherThreadToFinishPanicking() void {
         unreachable;
     }
 }
+
+fn sysShutdownOrReboot(cmd: Command, arg1: [*:0]const u8) !void {
+    const reboot_cmd: posix.RebootCommand = switch (cmd) {
+        .sys_shutdown => .{ .POWER_OFF = {} },
+        .sys_reboot => .{ .RESTART2 = arg1 },
+    };
+    try posix.reboot(reboot_cmd);
+}
+
+const Command = enum {
+    sys_reboot,
+    sys_shutdown,
+};
 
 const std = @import("std");
 const mem = std.mem;
