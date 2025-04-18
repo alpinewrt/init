@@ -216,6 +216,8 @@ fn switchRoot(new_root: [*:0]const u8) !void {
         };
     }
 
+    std.fs.deleteTreeAbsolute("/") catch {};
+
     try posix.chdir(mem.span(new_root));
 
     try posix_ext.mount(new_root, "/", null, linux.MS.MOVE, 0);
@@ -223,14 +225,6 @@ fn switchRoot(new_root: [*:0]const u8) !void {
     try posix_ext.chroot(".");
 
     try posix.chdir("/");
-
-    switch (try posix.fork()) {
-        0 => {
-            dir.deleteTree(".") catch {};
-            posix.exit(0);
-        },
-        else => {},
-    }
 }
 
 const PivotOptions = struct {
